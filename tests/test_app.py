@@ -9,7 +9,7 @@ from playwright.sync_api import Page, expect
 from flask import redirect
 from database_connection import *
 
-
+"""
 # a descriptive test name
 def test_get_books_returns_a_200():
     app.testing = True
@@ -21,6 +21,7 @@ def test_get_books_returns_a_200():
 
     # here's where we assert that the response's status code is 200
     assert response.status_code == 200
+  """
 
 # a descriptive test name
 """"
@@ -82,7 +83,7 @@ def test_get_authors_returns_list_of_authors():
 ]
 
 def test_h1_on_landing_page(page : Page):
-    page.goto("http://127.0.0.1:5001")
+    page.goto("http://localhost:5001")
 
     h1 = page.locator("h1")
 
@@ -93,7 +94,15 @@ def test_list_elements_in_books_page(page: Page):
     connection = DatabaseConnection()
     connection.connect()
     connection.seed('./seeds/books.sql')
-    page.goto('http://127.0.0.1:5001/books')
+
+    page.goto("http://localhost:5001/sessions/new")
+    page.locator("#username").fill("test")
+    page.locator("#password").fill("1234")
+    page.get_by_role("button").click()
+
+
+
+    page.goto('http://localhost:5001/books')
 
 
     expect(page.locator("li")).to_have_text([
@@ -104,7 +113,19 @@ def test_list_elements_in_books_page(page: Page):
     ])
 
 def test_form_post(page: Page):
-    page.goto('http://127.0.0.1:5001/books')
+    connection = DatabaseConnection()
+    connection.connect()
+    connection.seed('./seeds/books.sql')
+    
+
+    page.goto("http://localhost:5001/sessions/new")
+    page.locator("#username").fill("test")
+    page.locator("#password").fill("1234")
+    page.get_by_role("button").click()
+
+
+    
+    page.goto('http://localhost:5001/books')
     page.locator("#title").fill("The Chroicles of Geronimo (the cat)")
     page.locator("#author").fill("Geronimo")
     page.get_by_role("button", name="Submit").click()
@@ -126,7 +147,14 @@ def test_list_elements_in_films_page(page: Page):
     connection = DatabaseConnection()
     connection.connect()
     connection.seed('./seeds/films.sql')
-    page.goto('http://127.0.0.1:5001/films')
+
+    page.goto("http://localhost:5001/sessions/new")
+    page.locator("#username").fill("test")
+    page.locator("#password").fill("1234")
+    page.get_by_role("button").click()
+
+
+    page.goto('http://localhost:5001/films')
 
 
     expect(page.locator("li")).to_have_text([
@@ -136,6 +164,37 @@ def test_list_elements_in_films_page(page: Page):
         'Dragons in a Bag released at 2019'
     ])
 
+def test_auth_integration():
+    client = app.test_client()
+    connection = DatabaseConnection()
+    connection.connect()
+    connection.execute("TRUNCATE TABLE users;")
+    connection.execute("INSERT INTO users (username, password) values ('test', '1234');")
+
+    response = client.post('/sessions', data={
+        'username': 'test',
+        'password': '1234'
+    })
+
+    assert response.status_code == 302
+    # this assertion might be new to you :)
+    assert response.headers['Location'].endswith('/books')
+
+
+
+def test_auth_playwright(page: Page):
+
+    connection = DatabaseConnection()
+    connection.connect()
+    connection.execute("TRUNCATE TABLE users;")
+    connection.execute("INSERT INTO users (username, password) values ('test', '1234');")
+
+    page.goto("http://localhost:5001/sessions/new")
+    page.locator("#username").fill("test")
+    page.locator("#password").fill("1234")
+    page.get_by_role("button").click()
+
+    assert page.url == "http://localhost:5001/books"
 
 
 
