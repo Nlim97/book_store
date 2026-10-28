@@ -125,12 +125,11 @@ def test_form_post(page: Page):
 
 
     
-    page.goto('http://localhost:5001/books')
+    page.goto('http://localhost:5001/books/add')
     page.locator("#title").fill("The Chroicles of Geronimo (the cat)")
     page.locator("#author").fill("Geronimo")
     page.get_by_role("button", name="Submit").click()
 
-    redirect("/books")
     books = page.locator("li")
 
     expected_books = [

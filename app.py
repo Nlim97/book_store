@@ -52,7 +52,12 @@ def authors():
 def index():
     return render_template("index.html")
 
-@app.route("/books", methods=['POST'])
+@app.route('/books/add', methods=['GET'])
+@login_required
+def add_book_page():
+    return render_template("add_book.html")
+
+@app.route("/books/add", methods=['POST'])
 @login_required
 def create_book():
 
