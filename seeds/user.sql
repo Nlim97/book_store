@@ -1,0 +1,3 @@
+TRUNCATE table users RESTART IDENTITY;
+
+INSERT INTO users(username, password) VALUES('test', 'scrypt:32768:8:1$KMU9WiEwMjHb7uCd$ccbb79474791aac7fbd094002da9bc6c65c843bb6ff9e29691e6c1e221ae980551456e92dd8afe6b4ea44955b70caea98f22985658a749f47f46b6d34dbd623c');

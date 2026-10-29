@@ -1,4 +1,4 @@
-TRUNCATE table books;
+TRUNCATE table books RESTART IDENTITY;
 
 INSERT INTO books (title, author) VALUES ('The Gruffalo', 'Julia Donaldson');
 INSERT INTO books (title, author) VALUES ('Ada Twist, Scientist', 'Andrea Beaty');

@@ -5,6 +5,7 @@ from film import Film
 from userRepository import UserRepository
 from authenticated import is_authenticated
 from login_required import login_required
+from werkzeug.security import generate_password_hash, check_password_hash
 # instantiate a Flask app object
 app = Flask(__name__)
 app.secret_key = "some_really_secret_key"
@@ -24,7 +25,6 @@ def books():
     connection.connect()
     book_repository = BookRepository(connection)
     books = book_repository.all()
-    print(books)
     return render_template("books.html", books=books)
 
 @app.route("/authors", methods=['GET'])
@@ -88,7 +88,10 @@ def add_user():
     connection.connect()
     user_repo = UserRepository(connection)
     user_details = request.form
-    user_repo.save(user_details)
+    username = user_details['username']
+    password = generate_password_hash(user_details['password'])
+    user_repo.save(username, password)
+
     return redirect('/')
 
 @app.route('/sessions/new', methods=['GET'])
@@ -101,8 +104,10 @@ def check_user():
     connection.connect()
     user_repo = UserRepository(connection)
     user_details = request.form
-    user_found = user_repo.find(user_details)
-    if user_found:
+    username = user_details['username']
+    user_found = user_repo.find(username)
+    if user_found and check_password_hash(user_found['password'], user_details['password']):
+        session.clear()
         session['username'] = user_details['username']
         session['user_id'] = user_found['id']
         return redirect('/books')

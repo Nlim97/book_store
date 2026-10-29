@@ -5,13 +5,14 @@ class UserRepository:
     def __init__(self, connection):
         self.connection = connection
 
-    def save(self, new_user):
-        self.connection.execute("INSERT INTO users(username, password) VALUES(%s, %s)", [new_user['username'], new_user['password']])
+    def save(self, username, password):
+        self.connection.execute("INSERT INTO users(username, password) VALUES(%s, %s)", [username, password])
         return None
 
-    def find(self, user_details):
-        row = self.connection.execute('SELECT id, username, password FROM users WHERE username = %s AND password = %s', [user_details['username'], user_details['password']])
+    def find(self, username):
+        row = self.connection.execute('SELECT id, username, password FROM users WHERE username = %s' , [username,])
         if row:
-            return {'username': row[0]['username'], 'id': row[0]['id']}
+            return {'username': row[0]['username'], 'id': row[0]['id'], 'password': row[0]['password']}
+        print('false')
         return False
     
