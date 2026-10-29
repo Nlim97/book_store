@@ -195,4 +195,21 @@ def test_auth_playwright(page: Page):
     assert page.url == "http://localhost:5001/books"
 
 
+def test_film_form(page : Page):
+    connection = DatabaseConnection()
+    connection.connect()
+
+    page.goto("http://localhost:5001/sessions/new")
+    page.locator("#username").fill("test")
+    page.locator("#password").fill('1234')
+    page.get_by_role("button").click()
+
+
+    page.goto("http://localhost:5001/films/add")
+    page.locator("#title").fill('Dark Knight')
+    page.locator('#year').fill('2008') 
+    page.get_by_role('button').click()
+
+    assert page.url == "http://localhost:5001/films"
+
 

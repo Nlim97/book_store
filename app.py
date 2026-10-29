@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session
 from database_connection import DatabaseConnection
 from book_repository import BookRepository
 from film import Film
+from film_repository import FilmRepository
 from userRepository import UserRepository
 from authenticated import is_authenticated
 from login_required import login_required
@@ -112,6 +113,20 @@ def check_user():
         session['user_id'] = user_found['id']
         return redirect('/books')
     return redirect('/sessions/new')
+
+@app.route('/films/add', methods=['GET'])
+@login_required
+def get_film_form():
+    return render_template('film_form.html')
+
+@app.route('/films/new', methods=['POST'])
+def add_new_film():
+    connection = DatabaseConnection()
+    connection.connect()
+    film_repo = FilmRepository(connection)
+    form_details = request.form
+    film_repo.create(form_details)
+    return redirect("/films")
     
 
 
